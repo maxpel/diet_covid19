@@ -1,0 +1,5 @@
+# Ignore everything
+*
+# Don't ignore .gitignore and *.foo files
+!.gitignore
+![0-9]*.R
