@@ -4,3 +4,4 @@
 !.gitignore
 ![0-9]*.R
 !anobp_prepostcovid_gender_liwc_tweeteval.tsv
+!diet_dataset_README.txt
