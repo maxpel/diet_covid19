@@ -29,8 +29,9 @@ bintwnames <- paste0(twnames,"_bin")
 # # we also have to binarise the second dataset
 # setdiff(colnames(f),colnames(s))
 
-groupdata <- rbind(read_fst("first_dataset.fst",as.data.table = T),read_fst("second_dataset.fst",as.data.table = T))
+groupdata <- rbind(read_fst("first_dataset.fst",as.data.table = T),read_fst("second_dataset.fst",as.data.table = T),read_fst("ctrl_group.fst",as.data.table = T))
 
+# setdiff(colnames(read_fst("first_dataset.fst",as.data.table = T)),colnames(read_fst("ctrl_group.fst",as.data.table = T)))
 
 # # define periods
 # c[date >= as.Date("2020-03-15") & date <= as.Date("2021-03-15"),period:="post"]
@@ -61,6 +62,8 @@ write_fst(groupdata_usersubset,"groupdata_usersubset.fst")
 rm(groupdata)
 
 gc()
+
+# is the melt one needed? not for now, I guess
 
 groupdata_usersubset_melt <- melt(groupdata_usersubset,id.vars=c("id","group","gender_script","period"),measure.vars=c(bintwnames,liwcnames))
 

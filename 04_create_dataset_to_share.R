@@ -20,4 +20,4 @@ groupdata_usersubset <- read_fst("groupdata_usersubset.fst",as.data.table = T)
 
 dataset_toshare <- groupdata_usersubset[,c(list(number_tweets=.N),lapply(.SD,mean)),list(period,group,gender_script,userid),.SDcols=c(liwcnames,bintwnames)]
 
-fwrite(dataset_toshare,file="anobp_prepostcovid_gender_liwc_tweeteval.tsv",sep="\t")
+fwrite(dataset_toshare,file="anobpcontrol_prepostcovid_gender_liwc_tweeteval.tsv",sep="\t")
