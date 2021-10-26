@@ -3,5 +3,5 @@
 # Don't ignore .gitignore and *.foo files
 !.gitignore
 ![0-9]*.R
-!anobpcontrol_prepostcovid_gender_liwc_tweeteval.tsv
+!anobpcontrol_prepostcovid_gender_liwcbin_tweeteval.tsv
 !diet_dataset_README.txt
