@@ -20,6 +20,8 @@ liwcnames <- c("anger_liwc", "anxiety_liwc", "sadness_liwc", "posemo_liwc", "neg
 
 t <- fread("historic_tweets_1.tsv",quote="",select=c(1,2,3,17,18,20,13),col.names = c("text_raw","id","created_at","userid","name","followers","retweeted"),nrows=Inf)
 
+t[,index:=1:nrow(t)]
+
 # text filtering here still necessary for legacy reasons
 t <- t[!grepl("^RT",text_raw)]
 
@@ -140,6 +142,14 @@ first_dataset <- merge(first_dataset,g_script,by="name",all.x=T)
 
 write_fst(first_dataset,"first_dataset.fst")
 
+fwrite(first_dataset,"first_dataset.tsv")
+
+fwrite(first_dataset[,.(index)],"first_dataset_index",col.names = F)
+
+# write out text, to be subset with awk using the index file
+fwrite(fread("historic_tweets_1.tsv",quote="",select=c(1),col.names = c("text_raw"),nrows=Inf),"first_dataset_fulltext",col.names=F)
+
+
 # first_dataset <- read_fst("first_dataset.fst")
 
 
@@ -152,11 +162,13 @@ a <- cbind(
   rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_id",5:11),function(x) fread(x,nrows=Inf,col.names="id"))),
   rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_userid",5:11),function(x) fread(x,nrows=Inf,col.names="userid"))),
   rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_followers",5:11),function(x) fread(x,nrows=Inf,col.names="followers"))),
-  rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text_tweeteval",5:11),function(x) fread(x,nrows=Inf,col.names=twnames_bin))),
+  rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text_tweeteval",5:11),function(x) fread(x,nrows=Inf,col.names=twnames))),
   rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_name",5:11),function(x) fread(x,nrows=Inf,col.names="name",sep=NULL,header=F))),
   rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_retweeted_retweeted_boolean",5:11),function(x) fread(x,nrows=Inf,col.names="retweeted",sep=NULL,header=F)))[,retweeted:=as.logical(retweeted)],
   rbindlist(lapply(sprintf("liwc/tokenized_tweets%02d.tsv_text_liwc",5:11),function(x) fread(x,nrows=Inf,select=c("34","33","35","31","32","40","number_tokens"),col.names=c(liwcnames,"number_tokens"))))
   )
+
+a[,index:=1:nrow(a)]
 
 # 31	posemo (Positive Emotions)
 # 32	negemo (Negative Emotions)
@@ -241,6 +253,16 @@ second_dataset[,(twnames):=NULL]
 
 write_fst(second_dataset,"second_dataset.fst")
 
+fwrite(second_dataset,"second_dataset.tsv")
+
+
+fwrite(second_dataset[,.(index)],"second_dataset_index",col.names = F)
+
+# write out text, to be subset with awk using the index file
+# TO DO! must be somewhere on nvcluster?
+fwrite(rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text",5:11),function(x) fread(x,nrows=Inf,col.names="text"))),"second_dataset_fulltext",col.names=F)
+
+
 
 # History Control Group Second (not selecting highly active users but a random sample)
 # This group is too large, do the user subset before
@@ -257,6 +279,8 @@ ctrl_raw <- cbind(fread("ctrl_second/diet_ctrl_second.tsv_timestamp",col.names=c
       fread("ctrl_second/diet_ctrl_second.tsv_id",col.names=c("id"),sep=NULL,quote=""),
       fread("ctrl_second/diet_ctrl_second.tsv_name",col.names=c("name"),sep=NULL,quote="",header=F),
       fread("ctrl_second/diet_ctrl_second.tsv_followers",col.names=c("followers"),sep=NULL,quote=""))
+
+ctrl_raw[,index:=1:nrow(ctrl_raw)]
 
 # 11emo binarised with awk script in folder
 
@@ -334,4 +358,15 @@ ctrl <- ctrl[period == "pre"|period == "post"]
 
 ctrl <- ctrl[,group:="control"]
 
+
 write_fst(ctrl,"ctrl_group.fst")
+
+fwrite(ctrl,"ctrl_group.tsv")
+
+
+fwrite(ctrl[,.(index)],"ctrl_group_index",col.names = F)
+
+# write out text, to be subset with awk using the index file
+# TO DO! must be somewhere on nvcluster?
+fwrite(fread("ctrl_second/diet_ctrl_second.tsv_text",col.names="text"),"ctrl_group_fulltext",col.names=F)
+
