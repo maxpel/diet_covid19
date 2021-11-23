@@ -253,15 +253,25 @@ second_dataset[,(twnames):=NULL]
 
 write_fst(second_dataset,"second_dataset.fst")
 
-fwrite(second_dataset,"second_dataset.tsv")
+
+# read in to read out again
+second_dataset <- read_fst("second_dataset.fst",as.data.table = T)
+
+fwrite(second_dataset,"second_dataset.tsv",sep="\t")
 
 
 fwrite(second_dataset[,.(index)],"second_dataset_index",col.names = F)
 
 # write out text, to be subset with awk using the index file
-# TO DO! must be somewhere on nvcluster?
-fwrite(rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text",5:11),function(x) fread(x,nrows=Inf,col.names="text"))),"second_dataset_fulltext",col.names=F)
 
+# fread breaks
+# second_text <- rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text",5:11),function(x) fread(x,col.names="text",sep=NULL)))
+
+library(readr)
+
+second_text <- rbindlist(lapply(sprintf("history_adds/tweets%02d.tsv_text",5:11),function(x) data.table(text=read_lines(x))))
+
+fwrite(second_text,"second_dataset_fulltext",col.names=F)
 
 
 # History Control Group Second (not selecting highly active users but a random sample)
@@ -361,12 +371,14 @@ ctrl <- ctrl[,group:="control"]
 
 write_fst(ctrl,"ctrl_group.fst")
 
-fwrite(ctrl,"ctrl_group.tsv")
+# read in to read out again
+ctrl <- read_fst("ctrl_group.fst",as.data.table = T)
+
+fwrite(ctrl,"ctrl_group.tsv",sep="\t")
 
 
 fwrite(ctrl[,.(index)],"ctrl_group_index",col.names = F)
 
 # write out text, to be subset with awk using the index file
-# TO DO! must be somewhere on nvcluster?
-fwrite(fread("ctrl_second/diet_ctrl_second.tsv_text",col.names="text"),"ctrl_group_fulltext",col.names=F)
+fwrite(data.table(text=read_lines("ctrl_second/diet_ctrl_second.tsv_text")),"ctrl_group_fulltext",col.names=F)
 
