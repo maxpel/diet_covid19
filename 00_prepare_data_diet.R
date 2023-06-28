@@ -4,7 +4,7 @@ library(data.table)
 
 library(fst)
 
-setwd("/home/maxpe/Documents/diet/")
+# setwd("/home/maxpe/Documents/diet/")
 
 
 Sys.setlocale("LC_ALL", 'en_GB.UTF-8')
